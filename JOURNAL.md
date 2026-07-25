@@ -26,3 +26,13 @@ I spent some time reading the actual code before committing to this one, and tha
 What sold me was that there is already a test file at `tests/unit/test_faithfulness_checker.py` and the issue even points to a named test for this case. That means I can reproduce the crash quickly, watch it fail, and then watch it pass, which is the kind of tight feedback loop I wanted while I am still learning the repo. I could also explain the root cause out loud, which the checklist treats as a real signal that you understand the problem rather than just pattern matching a fix.
 
 The one thing I want to stay careful about is scope creep. It would be tempting to start cleaning up the claim extraction logic while I am in there, but that is not what the issue asks for, so I am going to keep the change focused on the None handling and the test that proves it.
+
+## Week 8 — Reproduction & solution planning
+
+**Reproduction summary:**
+I reproduced the crash two ways. First I called the checker directly with `FaithfulnessChecker().check('Knows Python.', [{'text': None}])` and watched it raise `TypeError: sequence item 0: expected str instance, NoneType found`. Then I ran the existing unit test `test_none_context_chunk_text`, which fails on the same line, `rag/evaluator/faithfulness_checker.py:34`, so I know exactly where the bug lives and I have a test that will flip to green once I fix it.
+
+**PLAN.md link:** https://github.com/Yd025/ai201-pathreview/blob/fix/153-faithfulness-none-text-chunk/PLAN.md
+
+**Blockers or open questions:**
+My one open question going into Week 9 is whether null text should ever reach the evaluator at all, or whether something further up in the retriever is letting bad chunks through. My fix makes the checker resilient either way, but I want to grep the retriever and generator before I decide the null guard is the whole story.

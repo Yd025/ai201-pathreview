@@ -28,6 +28,7 @@ What sold me was that there is already a test file at `tests/unit/test_faithfuln
 The one thing I want to stay careful about is scope creep. It would be tempting to start cleaning up the claim extraction logic while I am in there, but that is not what the issue asks for, so I am going to keep the change focused on the None handling and the test that proves it.
 
 ## Week 8 — Reproduction & solution planning
+**Reproduction commit link:**  [https://github.com/Yd025/ai201-pathreview/commit/a56837386879814f18742d96974c63b0fb1efcf1]
 
 **Reproduction summary:**
 I reproduced the crash two ways. First I called the checker directly with `FaithfulnessChecker().check('Knows Python.', [{'text': None}])` and watched it raise `TypeError: sequence item 0: expected str instance, NoneType found`. Then I ran the existing unit test `test_none_context_chunk_text`, which fails on the same line, `rag/evaluator/faithfulness_checker.py:34`, so I know exactly where the bug lives and I have a test that will flip to green once I fix it.

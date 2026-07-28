@@ -37,3 +37,35 @@ I reproduced the crash two ways. First I called the checker directly with `Faith
 
 **Blockers or open questions:**
 My one open question going into Week 9 is whether null text should ever reach the evaluator at all, or whether something further up in the retriever is letting bad chunks through. My fix makes the checker resilient either way, but I want to grep the retriever and generator before I decide the null guard is the whole story.
+
+## Week 9 — Solution building & PR submission
+
+### Check-in 1 (mid-week)
+
+**Current progress:**
+I have the fix drafted locally and the null test passing. Before I touched anything I ran the full unit suite and wrote down the baseline, which was 53 failing tests across the repo that have nothing to do with my issue. The change I am leaning toward is swapping the context concatenation in `faithfulness_checker.py` from `chunk.get("text", "")` to `chunk.get("text") or ""`, which lines up with sub-tasks 1 through 3 of my PLAN. With that in place `test_none_context_chunk_text` goes green for me, and I am sketching two more regression tests, one for a null chunk mixed in with a good chunk and one for an all null context list, before I commit the code and open the PR.
+
+**Next steps:**
+I want to close the loop on my open question from Week 8 and grep the retriever and generator to see where a null text value could come from, then finish the PR description and run make check one more time before I mark it ready.
+
+**Blockers:**
+None that are stopping me. The wrinkle I hit was that three other tests in the same file fail because of a separate scoring bug, so I had to be careful that my new mixed chunk test asserted on not crashing rather than on a specific score, since the score path is broken for a different reason.
+
+---
+
+### Check-in 2 (end of week)
+
+**PR link:** [link to your submitted pull request]
+
+**Branch:** [the branch name you worked on, e.g. `fix/123-short-description`]
+
+**What you built:**
+[1–3 sentences summarizing what your fix does and how it works]
+
+**Tests added or updated:**
+[Which test files did you touch? What do they cover?]
+
+**Self-review confirmation:** [ ] make check passes  [ ] make test-unit passes
+
+**Draft PR feedback received from:** [name or Slack handle, or "none"]
+

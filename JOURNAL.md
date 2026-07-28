@@ -28,7 +28,7 @@ What sold me was that there is already a test file at `tests/unit/test_faithfuln
 The one thing I want to stay careful about is scope creep. It would be tempting to start cleaning up the claim extraction logic while I am in there, but that is not what the issue asks for, so I am going to keep the change focused on the None handling and the test that proves it.
 
 ## Week 8 — Reproduction & solution planning
-**Reproduction commit link:**  [https://github.com/Yd025/ai201-pathreview/commit/a56837386879814f18742d96974c63b0fb1efcf1]
+**Reproduction commit link:** [https://github.com/Yd025/ai201-pathreview/commit/a56837386879814f18742d96974c63b0fb1efcf1](https://github.com/Yd025/ai201-pathreview/commit/a56837386879814f18742d96974c63b0fb1efcf1)
 
 **Reproduction summary:**
 I reproduced the crash two ways. First I called the checker directly with `FaithfulnessChecker().check('Knows Python.', [{'text': None}])` and watched it raise `TypeError: sequence item 0: expected str instance, NoneType found`. Then I ran the existing unit test `test_none_context_chunk_text`, which fails on the same line, `rag/evaluator/faithfulness_checker.py:34`, so I know exactly where the bug lives and I have a test that will flip to green once I fix it.
@@ -55,17 +55,19 @@ None that are stopping me. The wrinkle I hit was that three other tests in the s
 
 ### Check-in 2 (end of week)
 
-**PR link:** [link to your submitted pull request]
+**PR link:** [https://github.com/ascherj/pathreview/pull/334](https://github.com/ascherj/pathreview/pull/334)
 
-**Branch:** [the branch name you worked on, e.g. `fix/123-short-description`]
+**Branch:** `fix/153-faithfulness-none-text-chunk`
 
 **What you built:**
-[1–3 sentences summarizing what your fix does and how it works]
+The faithfulness checker used to crash with a TypeError whenever a retrieved context chunk carried `text: None`, because `dict.get` returns the real `None` value rather than the empty string default when the key is present. I changed the read to `chunk.get("text") or ""` so a null value collapses to an empty string, which means one malformed chunk no longer takes down the whole evaluation.
 
 **Tests added or updated:**
-[Which test files did you touch? What do they cover?]
+I touched `tests/unit/test_faithfulness_checker.py`. The pre-existing `test_none_context_chunk_text` goes from failing to passing, and I added `test_none_chunk_mixed_with_valid_chunk` and `test_all_none_context_chunks` to cover a null chunk alongside a good one and a context list that is entirely null.
 
-**Self-review confirmation:** [ ] make check passes  [ ] make test-unit passes
+**Self-review confirmation:** [x] make check passes  [x] make test-unit passes
+
+_Note on the boxes above:_ the repo has documented pre-existing failures that are unrelated to my issue. I recorded the baseline before starting (53 failing unit tests, plus pre-existing ruff and black findings in files I did not write). After my change the unit suite goes from 53 failing to 52 failing with three more passing, so I fixed one test and added two, and introduced no new failures. My own two changed files are clean under ruff, black, and mypy. In line with the assignment guidance, I am reading "passes" as "my changes introduce no new failures," not "the entire codebase is green."
 
 **Draft PR feedback received from:** [name or Slack handle, or "none"]
 
